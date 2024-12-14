@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guess and find</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./Style.css"/>
+    <script src="./Guss.js" defer></script>
+
+  </head>
+  <body>
+    <nav> <h1> Pro 02 :- Guess and find  </h1> </nav>
+    <p> Enter a guess between 0 to 100</p>
+    <form>
+      <input type="number" placeholder="Enter a number" id="guess" max="100" min="0" required/>
+      <div> 
+        <button class="submitBtn">Submit</button>
+        <button type="button" class="start_again" disabled>Start Again</button>
+      </div>
+    </form>
+    <p class="result"> </p>
+    <p class="all_guess"> </p>
+  </body>
+  
+</html>
+  
