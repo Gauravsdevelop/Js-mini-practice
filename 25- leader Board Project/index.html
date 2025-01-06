@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    
+    <style>
+        *{
+            margin:0;
+            padding:0;
+        }
+        body{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #0f133e;
+        }
+        h1{
+            text-align: center;
+            font-size: 60px;
+            color: white;
+        }
+        form{
+            text-align: center;
+            margin-top: 20px;
+            background-color:rgb(17, 121, 206);
+            padding:20px;
+            border:2px solid black;
+        }
+        input{
+            outline: none;
+            /* border: none; */
+            width:150px;
+            height: 30px;
+            padding:10px;
+            font-size: 20px;
+            
+        }
+        button{
+            outline: none;
+            /* border: none; */
+            width:150px;
+            height: 54px;
+            padding:10px;
+            font-size: 22px;
+            
+        }
+        select{
+            width: 150px;
+            height: 53px;
+            font-size: 20px;
+            color: black;
+        }
+       
+        .container{
+            width:60%;
+            max-height:430px;
+            border: 2px solid rgb(17, 121, 206);
+            padding:30px 20px;
+            margin: 40px 40px 0;
+            display: none;
+            overflow: scroll;
+            /* scrollbar-width: 0px; */
+            
+        }
+        .container::-webkit-scrollbar{
+                display: none;
+            }
+            ::placeholder{
+                color: black;
+            }
+        
+    </style>
+</head>
+<body>
+    <h1>🏆LEADERBOARD🏆</h1>
+    
+        <form action="">
+        <input type="text" class="fname" placeholder="First Name">
+        <input type="text" class="lname" placeholder="Last Name">
+       <select name="" class="country">
+        <option value="" selected>Select country</option>
+        <option value="India">India</option>
+        <option value="Australia">Australia</option>
+        <option value="England">England</option>
+        <option value="Pakistan">Pakistan</option>
+        <option value="Sri Lanka">Sri Lanka</option>
+       </select>
+        <input type="number" class="score" placeholder="Score">
+        <button>Add Score</button>
+    </form>
+   
+    <div class="container"></div>
+    <script src="script.js"></script>
+</body>
+</html>
