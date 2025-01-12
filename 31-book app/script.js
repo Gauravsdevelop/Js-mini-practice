@@ -32,20 +32,25 @@ async function loadBooks(categoryName) {
     const response = await fetch(booksApiUrl);
     const data = await response.json();
 
+    let booksLoaded = 0;
     data.forEach((book) => {
       if (book.list_name === categoryName) {
         book.books.forEach((bookDetail) => {
-          const bookCard = document.createElement("div");
-          bookCard.className = "book-card";
+          if (booksLoaded < 50) {  // Limit the books to 50
+            const bookCard = document.createElement("div");
+            bookCard.className = "book-card";
 
-          bookCard.innerHTML = `
-            <img src="${bookDetail.book_image}" alt="${bookDetail.title}" />
-            <h3>${bookDetail.title}</h3>
-            <p>${bookDetail.author}</p>
-            <p class="details">${bookDetail.description}</p>
-          `;
+            bookCard.innerHTML = `
+              <img src="${bookDetail.book_image}" alt="${bookDetail.title}" />
+              <h3>${bookDetail.title}</h3>
+              <p>${bookDetail.author}</p>
+              <p class="details">${bookDetail.description}</p>
+            `;
 
-          booksGrid.appendChild(bookCard);
+            bookCard.onclick = () => openPopup(bookDetail); // Open popup on click
+            booksGrid.appendChild(bookCard);
+            booksLoaded++;
+          }
         });
       }
     });
@@ -55,26 +60,63 @@ async function loadBooks(categoryName) {
   }
 }
 
-
 // Function to toggle Light and Dark Mode
 function toggleTheme() {
-    const themeButton = document.getElementById("themeButton");
-    const body = document.body;
-  
-    // Toggle the light-mode class on the body
-    body.classList.toggle("light-mode");
-  
-    // Update the button text based on the current mode
-    if (body.classList.contains("light-mode")) {
-      themeButton.textContent = "🌙 Dark Mode";
-    } else {
-      themeButton.textContent = "🌞 Light Mode";
-    }
-  }
-  
-  // Add event listener to the theme toggle button
-  document.getElementById("themeButton").addEventListener("click", toggleTheme);
-  
+  const themeButton = document.getElementById("themeButton");
+  const body = document.body;
 
-// Initialize categories on page load
+  body.classList.toggle("light-mode");
+
+  if (body.classList.contains("light-mode")) {
+    themeButton.textContent = "🌙 Dark Mode";
+  } else {
+    themeButton.textContent = "🌞 Light Mode";
+  }
+}
+
+document.getElementById("themeButton").addEventListener("click", toggleTheme);
+
+// Function to show book details popup
+function openPopup(book) {
+  document.getElementById("bookTitle").textContent = book.title;
+  document.getElementById("bookImage").src = book.book_image;
+  document.getElementById("bookAuthor").textContent = book.author;
+  document.getElementById("bookDescription").textContent = book.description;
+
+  document.getElementById("bookPopup").style.display = "flex";
+}
+
+// Function to close book details popup
+function closePopup() {
+  document.getElementById("bookPopup").style.display = "none";
+}
+
+// Modal handling code
+function showSignUpModal() {
+  document.getElementById("signUpModal").style.display = "flex";
+}
+
+function closeSignUpModal() {
+  document.getElementById("signUpModal").style.display = "none";
+}
+
+function showLoginModal() {
+  document.getElementById("loginModal").style.display = "flex";
+}
+
+function closeLoginModal() {
+  document.getElementById("loginModal").style.display = "none";
+}
+
+function signUp() {
+  // Implement your sign up logic here
+  closeSignUpModal();
+}
+
+function login() {
+  // Implement your login logic here
+  closeLoginModal();
+}
+
+// Initialize the page
 loadCategories();
