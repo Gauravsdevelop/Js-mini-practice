@@ -13,21 +13,55 @@
       <div class="theme-toggle">
         <button id="themeButton">🌞 Light Mode</button>
       </div>
-      <button class="signup">Sign up</button>
+      <div> 
+        <button class="signup" onclick="showSignUpModal()">Sign up</button>
+        <button class="login" onclick="showLoginModal()">Login</button>
+      </div>
     </header>
     <div class="content">
       <aside>
         <h3>ALL CATEGORIES</h3>
-        <ul id="categories">
-          <!-- Categories will be dynamically populated -->
-        </ul>
+        <ul id="categories"></ul>
       </aside>
       <main>
         <h1 id="page-title">Best Sellers Books</h1>
-        <div id="books-grid" class="books-grid">
-          <!-- Books will be dynamically populated -->
-        </div>
+        <div id="books-grid" class="books-grid"></div>
       </main>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button onclick="login()">Login</button>
+      <span>No account? <a href="javascript:void(0);" onclick="showSignUpModal()">Sign up</a></span>
+      <button onclick="closeLoginModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Sign-Up Modal -->
+  <div id="signUpModal" class="modal">
+    <div class="modal-content">
+      <h2>Sign Up</h2>
+      <input type="email" id="signUpEmail" placeholder="Email" required>
+      <input type="password" id="signUpPassword" placeholder="Password" required>
+      <button onclick="signUp()">Sign Up</button>
+      <span>Already have an account? <a href="javascript:void(0);" onclick="showLoginModal()">Login</a></span>
+      <button onclick="closeSignUpModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Book Detail Popup -->
+  <div id="bookPopup" class="popup">
+    <div class="popup-content">
+      <h2 id="bookTitle"></h2>
+      <img id="bookImage" src="" alt="Book Image">
+      <p id="bookAuthor"></p>
+      <p id="bookDescription"></p>
+      <button onclick="closePopup()">Close</button>
     </div>
   </div>
 
