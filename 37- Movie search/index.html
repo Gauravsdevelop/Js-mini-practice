@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search Application</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            text-align: center;
+            background: #4c47ff;;
+            color: #fff;
+            padding: 20px 0;
+        }
+
+        #searchInput {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #loading {
+            color: #333;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        #movieResults {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-details {
+            padding: 10px;
+        }
+
+        .movie-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        #pagination {
+            text-align: center;
+            margin-top: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .page-btn {
+            padding: 10px 15px;
+            margin: 0 5px;
+            background: #4c47ff;;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .page-btn:disabled {
+            background: #8187ff;
+            cursor: not-allowed;
+        }
+
+        .show-more-btn {
+            padding: 10px 15px;
+            margin: 20px 0;
+            background: #4c47ff;;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            background: #4c47ff;;
+            color: #fff;
+            padding: 10px 0;
+            margin-top: 20px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+            border: 5px solid darkblue;
+            border-radius: 45px;
+        }
+
+        .modal-content iframe {
+            width: 100%;
+            height: 315px;
+            border: none;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4c47ff;;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Movie Search</h1>
+        <input type="text" id="searchInput" placeholder="Search for a movie...">
+        <div id="loading" class="hidden">Loading...</div>
+    </header>
+    
+    <main>
+        <section id="movieResults"></section>
+        <button id="showMoreButton" class="show-more-btn hidden">Show More</button>
+        <div id="pagination"></div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Movie Search Application , made with ❤️ By Gaurav Sharma</p>
+    </footer>
+
+    <!-- Modal for Movie Details -->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <div id="movieModalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const movieResults = document.getElementById('movieResults');
+        const pagination = document.getElementById('pagination');
+        const loading = document.getElementById('loading');
+        const showMoreButton = document.getElementById('showMoreButton');
+        const movieModal = document.getElementById('movieModal');
+        const movieModalContent = document.getElementById('movieModalContent');
+        let debounceTimer;
+        let currentPage = 1;
+        let totalPages = 0;
+        const apiKey = 'c4bb1c76';
+
+        async function fetchMovies(query, page = 1) {
+            try {
+                loading.classList.remove('hidden');
+                const response = await fetch(`https://www.omdbapi.com/?apikey=${apiKey}&s=${query}&page=${page}`);
+                const data = await response.json();
+
+                if (data.Response === 'True') {
+                    displayMovies(data.Search);
+                    totalPages = Math.ceil(data.totalResults / 10);
+                    setupPagination(query, page, totalPages);
+                } else {
+                    movieResults.innerHTML = `<p>No results found for "${query}"</p>`;
+                }
+            } catch (error) {
+                console.error('Error fetching movies:', error);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function displayMovies(movies) {
+            movieResults.innerHTML = movies.map(movie => 
+                `<div class="movie-card" onclick="fetchMovieDetails('${movie.imdbID}')">
+                    <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'placeholder.jpg'}" alt="${movie.Title}" class="movie-poster">
+                    <div class="movie-details">
+                        <h3 class="movie-title">${movie.Title}</h3>
+                        <p>${movie.Year}</p>
+                    </div>
+                </div>`
+            ).join('');
+        }
+
+        async function fetchMovieDetails(imdbID) {
+            try {
+                loading.classList.remove('hidden');
+                const response = await fetch(`https://www.omdbapi.com/?apikey=${apiKey}&i=${imdbID}&plot=full`);
+                const data = await response.json();
+
+                if (data.Response === 'True') {
+                    showMovieModal(data);
+                } else {
+                    console.error('Movie details not found.');
+                }
+            } catch (error) {
+                console.error('Error fetching movie details:', error);
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        function showMovieModal(movie) {
+            movieModalContent.innerHTML = `
+                <h2>${movie.Title} (${movie.Year})</h2>
+                <p><strong>Director:</strong> ${movie.Director}</p>
+                <p><strong>Cast:</strong> ${movie.Actors}</p>
+                <p><strong>Plot:</strong> ${movie.Plot}</p>
+                <p><strong>Rating:</strong> ${movie.imdbRating}</p>
+                <div class="trailer">
+                    <h3>Trailer:</h3>
+                    <iframe src="https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(movie.Title + ' trailer')}" allowfullscreen></iframe>
+                </div>
+            `;
+            movieModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            movieModal.style.display = 'none';
+        }
+
+        function setupPagination(query, currentPage, totalPages) {
+            pagination.innerHTML = '';
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            const pageCount = endPage - startPage + 1;
+
+            // Left navigation button
+            const leftNavButton = document.createElement('button');
+            leftNavButton.className = 'page-btn';
+            leftNavButton.textContent = '←';
+            leftNavButton.disabled = currentPage === 1;
+            leftNavButton.addEventListener('click', () => {
+                fetchMovies(query, currentPage - 1);
+            });
+            pagination.appendChild(leftNavButton);
+
+            // Page number buttons (max 6)
+            for (let i = startPage; i <= endPage; i++) {
+                const button = document.createElement('button');
+                button.className = 'page-btn';
+                button.textContent = i;
+                button.disabled = i === currentPage;
+                button.addEventListener('click', () => fetchMovies(query, i));
+                pagination.appendChild(button);
+            }
+
+            // Right navigation button
+            const rightNavButton = document.createElement('button');
+            rightNavButton.className = 'page-btn';
+            rightNavButton.textContent = '→';
+            rightNavButton.disabled = currentPage === totalPages;
+            rightNavButton.addEventListener('click', () => {
+                fetchMovies(query, currentPage + 1);
+            });
+            pagination.appendChild(rightNavButton);
+
+            // Show More button if there are more pages
+            if (currentPage < totalPages) {
+                showMoreButton.classList.remove('hidden');
+                showMoreButton.onclick = function () {
+                    fetchMovies(query, currentPage + 1);
+                };
+            } else {
+                showMoreButton.classList.add('hidden');
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const query = searchInput.value.trim();
+            if (query) {
+                debounceTimer = setTimeout(() => fetchMovies(query), 500);
+            } else {
+                movieResults.innerHTML = '';
+                pagination.innerHTML = '';
+                showMoreButton.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
