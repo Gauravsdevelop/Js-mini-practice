@@ -1,0 +1,5 @@
+/* Define your CSS styles for the chart container or other elements here */
+.chart-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
